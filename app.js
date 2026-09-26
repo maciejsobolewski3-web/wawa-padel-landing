@@ -29,23 +29,136 @@
   window.addEventListener('scroll', syncHeader, { passive: true });
   syncHeader();
 
+  // Motion is progressive enhancement: content remains visible without JS or observers.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const syncMotion = () => document.body.classList.toggle('motion-enabled', !reduceMotion.matches);
+  const desktopMotion = window.matchMedia('(min-width: 981px) and (hover: hover)');
+  const seen = new WeakSet();
+  const counted = new WeakSet();
+  const activeCounters = new Map();
+  const counters = [...document.querySelectorAll('[data-count]')];
+  const progress = document.querySelector('.progress-track');
+  let progressSeen = false;
+  let revealObserver, countObserver, progressObserver, photoObserver;
+  let photoFrame = 0;
+  const visiblePhotos = new Set();
+  const photos = [...document.querySelectorAll('.hero-image, .feature-image, .location')];
+
+  // Keep the exact final number's width and one stable value for screen readers.
+  counters.forEach(element => {
+    const final = element.textContent;
+    const value = document.createElement('b');
+    value.className = 'count-value'; value.setAttribute('aria-hidden', 'true'); value.textContent = final;
+    const stable = document.createElement('b');
+    stable.className = 'count-final'; stable.textContent = final;
+    element.replaceChildren(stable, value);
+  });
+  function finishCount(element) {
+    cancelAnimationFrame(activeCounters.get(element));
+    activeCounters.delete(element);
+    element.querySelector('.count-value').textContent = element.dataset.count;
+    counted.add(element);
+  }
+  function startCount(element) {
+    if (counted.has(element) || activeCounters.has(element)) return;
+    const start = performance.now();
+    const value = element.querySelector('.count-value');
+    const target = Number(element.dataset.count);
+    value.textContent = '0';
+    function tick(now) {
+      const t = Math.min(1, (now - start) / 1050);
+      value.textContent = String(Math.floor(target * (1 - Math.pow(1 - t, 3))));
+      if (t < 1) activeCounters.set(element, requestAnimationFrame(tick));
+      else finishCount(element);
+    }
+    activeCounters.set(element, requestAnimationFrame(tick));
+  }
+
+  // Reveal siblings in order; avoid double-animating parents and their children.
+  document.querySelectorAll('.facts, .faq-list').forEach(el => el.classList.remove('reveal'));
+  document.querySelectorAll('.facts > div, .faq details, .location-copy, .feature-image, .closing > .eyebrow, .closing > .button').forEach(el => el.classList.add('reveal'));
+  document.querySelectorAll('.location-copy .reveal').forEach(el => el.classList.remove('reveal'));
+  const reveals = [...document.querySelectorAll('.reveal')];
+  document.querySelectorAll('.intro-grid, .facts, .play-grid, .signup, .survey, .cooperation, .faq-list').forEach(group => {
+    [...group.children].filter(el => el.classList.contains('reveal')).forEach((el, i) => el.style.setProperty('--reveal-delay', `${Math.min(i, 3) * 85}ms`));
+  });
+  function show(element) {
+    element.classList.remove('reveal-pending');
+    element.classList.add('reveal-visible');
+    seen.add(element);
+    revealObserver?.unobserve(element);
+  }
+  // Keyboard navigation must never focus an invisible link or control.
+  document.addEventListener('focusin', event => {
+    const pending = event.target.closest('.reveal-pending');
+    if (pending) { pending.style.setProperty('--reveal-delay', '0ms'); show(pending); }
+  });
+  function paintPhotos() {
+    photoFrame = 0;
+    if (reduceMotion.matches || !desktopMotion.matches || document.hidden) return;
+    for (const element of visiblePhotos) {
+      const rect = element.getBoundingClientRect();
+      const offset = Math.max(-12, Math.min(12, ((innerHeight / 2 - rect.top - rect.height / 2) / innerHeight) * 24));
+      element.style.setProperty('--photo-offset', `${offset.toFixed(2)}px`);
+    }
+  }
+  function schedulePhotos() {
+    if (!photoFrame && visiblePhotos.size && !reduceMotion.matches && desktopMotion.matches && !document.hidden) photoFrame = requestAnimationFrame(paintPhotos);
+  }
+  window.addEventListener('scroll', schedulePhotos, { passive: true });
+  window.addEventListener('resize', schedulePhotos, { passive: true });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) [...activeCounters.keys()].forEach(finishCount);
+    else schedulePhotos();
+  });
+  function syncPhotoMode() {
+    photos.forEach(el => el.style.removeProperty('--photo-offset'));
+    schedulePhotos();
+  }
+  desktopMotion.addEventListener('change', syncPhotoMode);
+  function syncMotion() {
+    const enabled = !reduceMotion.matches && 'IntersectionObserver' in window;
+    document.body.classList.toggle('motion-enabled', enabled);
+    [revealObserver, countObserver, progressObserver, photoObserver].forEach(observer => observer?.disconnect());
+    cancelAnimationFrame(photoFrame); photoFrame = 0; visiblePhotos.clear();
+    photos.forEach(el => el.style.removeProperty('--photo-offset'));
+    if (!enabled) {
+      reveals.forEach(show);
+      counters.forEach(finishCount);
+      progress.classList.remove('progress-pending');
+      progressSeen = true;
+      return;
+    }
+    revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) show(entry.target); });
+    }, { threshold: .08 });
+    reveals.forEach(element => {
+      if (seen.has(element)) return;
+      const rect = element.getBoundingClientRect();
+      if (rect.top < innerHeight && rect.bottom > 0) show(element);
+      else if (rect.bottom <= 0) show(element);
+      else { element.classList.add('reveal-pending'); revealObserver.observe(element); }
+    });
+    countObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) { startCount(entry.target); countObserver.unobserve(entry.target); } });
+    }, { threshold: .8 });
+    counters.filter(el => !counted.has(el)).forEach(el => countObserver.observe(el));
+    if (!progressSeen) {
+      progress.classList.add('progress-pending');
+      progressObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          progress.classList.remove('progress-pending'); progressSeen = true; progressObserver.disconnect();
+        }
+      }, { threshold: 1 });
+      progressObserver.observe(progress);
+    }
+    photoObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) visiblePhotos.add(entry.target); else visiblePhotos.delete(entry.target); });
+      schedulePhotos();
+    });
+    photos.forEach(el => photoObserver.observe(el));
+  }
   reduceMotion.addEventListener('change', syncMotion);
   syncMotion();
-  if ('IntersectionObserver' in window && !reduceMotion.matches) {
-    const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) if (entry.isIntersecting) {
-        entry.target.classList.remove('reveal-pending');
-        entry.target.classList.add('reveal-visible');
-        observer.unobserve(entry.target);
-      }
-    }, { threshold: .06 });
-    document.querySelectorAll('.reveal').forEach(element => {
-      if (element.getBoundingClientRect().top > innerHeight) element.classList.add('reveal-pending');
-      observer.observe(element);
-    });
-  }
 
   // Demonstration only: all answers remain in this page's memory. No network or storage.
   const questions = [

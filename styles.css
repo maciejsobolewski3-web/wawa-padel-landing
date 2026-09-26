@@ -97,3 +97,47 @@ html{scroll-padding-top:110px}
  .location h2{font-size:clamp(2.4rem,8.5vw,4rem)}
  .location-caption{left:var(--pad);right:auto;bottom:20px}
 }
+
+/* V10: a restrained motion layer; no layout or brand changes. */
+.count,.count>b{font:inherit;letter-spacing:inherit}
+.count{display:inline-grid;vertical-align:baseline}
+.count>b{grid-area:1/1;line-height:inherit}
+.count-final{opacity:0;pointer-events:none}
+.motion-enabled .hero-copy{animation:none}
+.motion-enabled .hero-copy>.eyebrow{animation:hero-arrive .65s cubic-bezier(.2,.7,.2,1) both}
+.motion-enabled .hero-copy>h1{animation:hero-arrive .9s cubic-bezier(.16,1,.3,1) .1s both}
+.motion-enabled .hero-copy>p:not(.eyebrow){animation:hero-arrive .75s cubic-bezier(.2,.7,.2,1) .26s both}
+.motion-enabled .hero-copy>.button{animation:hero-arrive .7s cubic-bezier(.2,.7,.2,1) .4s backwards}
+.motion-enabled .hero-bottom{animation:hero-arrive .75s cubic-bezier(.2,.7,.2,1) .55s both}
+@keyframes hero-arrive{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.motion-enabled .reveal-pending{opacity:0;transform:translateY(20px) scale(.995)}
+.motion-enabled .reveal-visible{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.2,.7,.2,1) var(--reveal-delay,0ms),transform .7s cubic-bezier(.16,1,.3,1) var(--reveal-delay,0ms),translate .3s ease}
+.motion-enabled .reveal:focus-within{opacity:1;transform:none;transition-delay:0ms}
+.button{transition:transform .25s cubic-bezier(.2,.7,.2,1),background .25s,box-shadow .25s}
+.button>span,.text-link>span,.back-top>span{display:inline-block;transition:transform .25s cubic-bezier(.2,.7,.2,1)}
+.play-card{transition:translate .35s cubic-bezier(.2,.7,.2,1)}
+.card-image{transition:box-shadow .35s}
+.progress-track>span{transform-origin:left;transition:width .5s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.motion-enabled .progress-pending>span{transform:scaleX(0)}
+@media(hover:hover) and (pointer:fine){
+ .motion-enabled .play-card:hover{translate:0 -5px}
+ .motion-enabled .play-card:hover .card-image{box-shadow:0 14px 28px -18px #22131966}
+ .motion-enabled .button:not(:disabled):hover{transform:translateY(-2px) scale(1.015)}
+ .motion-enabled .button:not(:disabled):hover>span{transform:translate(3px,-2px)}
+ .motion-enabled .text-link:hover>span{transform:translate(3px,-2px)}
+ .motion-enabled .back-top:hover>span{transform:translateY(-3px)}
+}
+.motion-enabled .button:not(:disabled):active{transform:translateY(1px) scale(.98);transition-duration:.1s}
+@media(min-width:981px) and (hover:hover){
+ .motion-enabled .hero-image{transform:translate3d(0,var(--photo-offset,0px),0);inset:-14px 0}
+ .motion-enabled .feature-image img,.motion-enabled .location-photo{transform:translate3d(0,var(--photo-offset,0px),0) scale(1.045)}
+}
+@media(max-width:760px){
+ .motion-enabled .reveal-pending{transform:translateY(12px)}
+ .motion-enabled .reveal-visible{transition-duration:.5s;transition-delay:0ms}
+}
+@media(prefers-reduced-motion:reduce){
+ .reveal-pending{opacity:1;transform:none}
+ .button:hover,.button:active,.play-card:hover .card-image>img{transform:none}
+ .progress-track>span{transform:none}
+}
