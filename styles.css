@@ -20,3 +20,22 @@
 
 /* Lime typography in the survey, including subsequent questions and summary. */
 .survey,.survey .section-label,.survey h2,.survey .preview-note,.survey-progress,#survey-result>p:not(.section-label),#answer-summary dt{color:var(--lime)}
+
+/* Alternate survey and cooperation surfaces. */
+.survey{background:var(--ivory);color:var(--wine)}
+.survey .section-label,.survey h2,.survey .preview-note,.survey-progress,#survey-result>p:not(.section-label),#answer-summary dt{color:var(--wine)}
+.survey-panel,#survey-options label{border-color:var(--line)}
+#survey-options label:last-child{border-color:var(--line)}
+#survey-options label:has(input:checked){background:#4a142808}
+#survey-options input{accent-color:var(--wine)}
+.survey .progress-track{background:var(--line)}
+.survey .progress-track>span{background:var(--wine)}
+.survey-error{color:var(--wine)}
+.cooperation{background:var(--wine);color:var(--ivory)}
+.cooperation h2,.cooperation h3,.cooperation .section-label,.cooperation .form-panel label:not(.checkbox-label),.cooperation .interest-options legend{color:var(--ivory)}
+.cooperation .form-intro>p:not(.section-label),.cooperation .preview-note{color:#dfcdd5}
+.cooperation .form-panel{border-color:#ae8e9b}
+.cooperation .form-panel input[type=email],.cooperation .form-panel textarea{border-color:#ae8e9b;color:var(--ivory);-webkit-text-fill-color:var(--ivory)}
+.cooperation .form-panel input::placeholder,.cooperation .form-panel textarea::placeholder{color:#dfcdd5;-webkit-text-fill-color:#dfcdd5;opacity:1}
+.cooperation .interest-options input{accent-color:var(--lime)}
+.cooperation .button{background:var(--lime);color:var(--wine)}
