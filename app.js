@@ -162,7 +162,7 @@
 
   // Demonstration only: all answers remain in this page's memory. No network or storage.
   const questions = [
-    { title: 'Jak długo grasz w padla?', options: ['Jeszcze nie gram — chcę spróbować', 'Zaczynam, mam za sobą kilka gier', 'Gram regularnie', 'Gram w turniejach lub lidze'] },
+    { title: 'Jak długo grasz w padla?', options: ['Jeszcze nie gram, chcę spróbować', 'Zaczynam, mam za sobą kilka gier', 'Gram regularnie', 'Gram w turniejach lub lidze'] },
     { title: 'Kiedy najchętniej grasz?', options: ['Rano w tygodniu', 'W ciągu dnia w tygodniu', 'Wieczorami w tygodniu', 'W weekendy'] },
     { title: 'Z kim chcesz grać?', options: ['Mam już swoją ekipę', 'Chcę poznawać nowych partnerów do gry', 'Z rodziną lub znajomymi', 'Z osobami na podobnym poziomie'] },
     { title: 'Jaki format najbardziej Cię interesuje?', options: ['Swobodna gra i rezerwacja kortu', 'Nauka gry i treningi', 'Otwarte mecze i spotkania graczy', 'Turnieje i liga'] },
@@ -191,7 +191,7 @@
       label.append(input, span); options.append(label);
     });
     back.disabled = step === 0;
-    next.textContent = step === questions.length - 1 ? 'Zobacz podsumowanie' : 'Dalej →';
+    next.textContent = step === questions.length - 1 ? 'Zobacz podsumowanie' : 'Dalej';
     error.textContent = '';
     if (focus) question.focus({ preventScroll: true });
   }
