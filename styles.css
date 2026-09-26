@@ -17,3 +17,6 @@
 @media(max-width:760px){.signup,.survey,.cooperation{grid-template-columns:1fr;gap:36px}.hero-image img{object-position:59% center}.header .logo{width:140px}.hero-note{display:none}.hero-bottom .scroll-cue{display:flex}.form-panel{padding-top:24px}.form-intro h2,.survey h2{font-size:clamp(2rem,8vw,3.6rem)}.survey-panel{min-height:450px}.interest-options{grid-template-columns:1fr}.closing-mark{width:70%;right:-10%;top:190px}.survey .button{font-size:.85rem;padding:14px 18px}.survey-actions{gap:14px}.header .logo img{height:53px}}
 @media(max-width:380px){.header .logo{width:118px}.hero-note{display:none}.survey-panel h3{font-size:1.4rem}}
 @media(prefers-reduced-motion:reduce){.hero-image img{animation:none!important;transform:none}}
+
+/* Lime typography in the survey, including subsequent questions and summary. */
+.survey,.survey .section-label,.survey h2,.survey .preview-note,.survey-progress,#survey-result>p:not(.section-label),#answer-summary dt{color:var(--lime)}
