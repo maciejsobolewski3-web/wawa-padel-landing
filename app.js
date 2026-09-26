@@ -1,75 +1,67 @@
 'use strict';
 (() => {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const hero = document.querySelector('.hero');
-  const slides = [...document.querySelectorAll('.slide')];
-  const dots = [...document.querySelectorAll('.slide-dots button')];
-  const pause = document.querySelector('#pause');
-  const captions = ['Twoja ekipa. Twój kort.', 'Jeszcze punkt. Jeszcze mecz.', 'Wszystko zaczyna się od piłki.'];
-  let current = 0;
-  let userPaused = reduceMotion.matches;
-  let hovering = false;
-  let focusPaused = false;
-  let timer;
-
-  function schedule() {
-    window.clearTimeout(timer);
-    hero.classList.toggle("carousel-paused", userPaused || hovering || focusPaused || document.hidden);
-    if (!userPaused && !hovering && !focusPaused && !document.hidden && !reduceMotion.matches) {
-      timer = window.setTimeout(() => show(current + 1), 7500);
-    }
-  }
-  function show(index, announce = false) {
-    current = (index + slides.length) % slides.length;
-    slides.forEach((slide, i) => {
-      slide.classList.toggle('is-active', i === current);
-      slide.setAttribute('aria-hidden', String(i !== current));
-      dots[i].setAttribute('aria-pressed', String(i === current));
-    });
-    document.querySelector('#slide-caption').textContent = captions[current];
-    document.querySelector('.caption-count').textContent = `0${current + 1} / 03`;
-    if (announce) document.querySelector('#carousel-announcement').textContent = `Zdjęcie ${current + 1} z 3. ${captions[current]}`;
-    schedule();
-  }
-  function syncPauseButton() {
-    pause.textContent = userPaused ? '▷' : 'Ⅱ';
-    pause.setAttribute('aria-label', userPaused ? 'Włącz automatyczną zmianę zdjęć' : 'Wstrzymaj automatyczną zmianę zdjęć');
-    pause.hidden = reduceMotion.matches;
-    document.body.classList.toggle('motion-enabled', !reduceMotion.matches);
-    schedule();
-  }
-  document.querySelector('.carousel-controls').hidden = false;
-  document.querySelector('#previous').addEventListener('click', () => show(current - 1, true));
-  document.querySelector('#next').addEventListener('click', () => show(current + 1, true));
-  dots.forEach((dot, i) => dot.addEventListener('click', () => show(i, true)));
-  pause.addEventListener('click', () => { userPaused = !userPaused; syncPauseButton(); });
-  hero.addEventListener('mouseenter', () => { hovering = true; schedule(); });
-  hero.addEventListener('mouseleave', () => { hovering = false; schedule(); });
-  // Autoplay pauses while keyboard focus is inside the carousel.
-  hero.addEventListener('focusin', () => { focusPaused = true; schedule(); });
-  hero.addEventListener('focusout', () => { focusPaused = false; schedule(); });
-  document.querySelector('.carousel-controls').addEventListener('keydown', event => {
-    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-      event.preventDefault(); show(current + (event.key === 'ArrowRight' ? 1 : -1), true);
-    }
-  });
-  document.addEventListener('visibilitychange', schedule);
-  reduceMotion.addEventListener('change', () => { userPaused = reduceMotion.matches; syncPauseButton(); });
-  syncPauseButton();
-
+  const syncMotion = () => document.body.classList.toggle('motion-enabled', !reduceMotion.matches);
+  reduceMotion.addEventListener('change', syncMotion);
+  syncMotion();
   if ('IntersectionObserver' in window && !reduceMotion.matches) {
     const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove('reveal-pending');
-          entry.target.classList.add('reveal-visible');
-          observer.unobserve(entry.target);
-        }
+      for (const entry of entries) if (entry.isIntersecting) {
+        entry.target.classList.remove('reveal-pending');
+        entry.target.classList.add('reveal-visible');
+        observer.unobserve(entry.target);
       }
     }, { threshold: .06 });
     document.querySelectorAll('.reveal').forEach(element => {
-      if (element.getBoundingClientRect().top > window.innerHeight) element.classList.add('reveal-pending');
+      if (element.getBoundingClientRect().top > innerHeight) element.classList.add('reveal-pending');
       observer.observe(element);
     });
   }
+
+  // Demonstration only: all answers remain in this page's memory. No network or storage.
+  const questions = [
+    { title: 'Jak długo grasz w padla?', options: ['Jeszcze nie gram — chcę spróbować', 'Zaczynam, mam za sobą kilka gier', 'Gram regularnie', 'Gram w turniejach lub lidze'] },
+    { title: 'Kiedy najchętniej grasz?', options: ['Rano w tygodniu', 'W ciągu dnia w tygodniu', 'Wieczorami w tygodniu', 'W weekendy'] },
+    { title: 'Z kim chcesz grać?', options: ['Mam już swoją ekipę', 'Chcę poznawać nowych partnerów do gry', 'Z rodziną lub znajomymi', 'Z osobami na podobnym poziomie'] },
+    { title: 'Jaki format najbardziej Cię interesuje?', options: ['Swobodna gra i rezerwacja kortu', 'Nauka gry i treningi', 'Otwarte mecze i spotkania graczy', 'Turnieje i liga'] },
+    { title: 'Co jest dla Ciebie najważniejsze w klubie?', options: ['Dostępność terminów', 'Atmosfera i ludzie', 'Możliwość rozwoju', 'Wygodny dojazd'] }
+  ];
+  const answers = Array(questions.length).fill(null);
+  let step = 0;
+  const ui = document.querySelector('#survey-ui');
+  const options = document.querySelector('#survey-options');
+  const question = document.querySelector('#survey-question');
+  const next = document.querySelector('#survey-next');
+  const back = document.querySelector('#survey-back');
+  const error = document.querySelector('#survey-error');
+  const result = document.querySelector('#survey-result');
+  function render(focus = false) {
+    question.textContent = questions[step].title;
+    document.querySelector('#step-label').textContent = `Pytanie ${step + 1} z ${questions.length}`;
+    document.querySelector('#step-fill').style.width = `${((step + 1) / questions.length) * 100}%`;
+    options.replaceChildren();
+    const legend = document.createElement('legend'); legend.className = 'sr-only'; legend.textContent = questions[step].title; options.append(legend);
+    questions[step].options.forEach((text, i) => {
+      const label = document.createElement('label');
+      const input = document.createElement('input'); input.type = 'radio'; input.name = `question-${step}`; input.value = String(i); input.checked = answers[step] === i;
+      input.addEventListener('change', () => { answers[step] = i; error.textContent = ''; });
+      const span = document.createElement('span'); span.textContent = text;
+      label.append(input, span); options.append(label);
+    });
+    back.disabled = step === 0;
+    next.textContent = step === questions.length - 1 ? 'Zobacz podsumowanie' : 'Dalej →';
+    error.textContent = '';
+    if (focus) question.focus({ preventScroll: true });
+  }
+  back.addEventListener('click', () => { if (step > 0) { step--; render(true); } });
+  next.addEventListener('click', () => {
+    if (answers[step] === null) { error.textContent = 'Wybierz jedną odpowiedź, aby przejść dalej.'; options.querySelector('input').focus({preventScroll:true}); return; }
+    if (step < questions.length - 1) { step++; render(true); return; }
+    const summary = document.querySelector('#answer-summary'); summary.replaceChildren();
+    questions.forEach((q, i) => { const dt = document.createElement('dt'); dt.textContent = q.title; const dd = document.createElement('dd'); dd.textContent = q.options[answers[i]]; summary.append(dt, dd); });
+    ui.hidden = true; result.hidden = false; document.querySelector('#result-heading').focus({ preventScroll: true });
+  });
+  document.querySelector('#survey-restart').addEventListener('click', () => { answers.fill(null); step = 0; result.hidden = true; ui.hidden = false; render(true); });
+  ui.hidden = false;
+  render();
 })();

@@ -27,3 +27,10 @@ Wybrać narzędzie/formularz przechowujący zgłoszenia, ustalić administratora
 - Sekcje: baner, pasek informacji, klub i fakty, trzy podejścia do gry, indoor, plan otwarcia, lokalizacja, FAQ, końcowe zaproszenie.
 - `app.js` obsługuje karuzelę i animacje. Bez JavaScript treść i FAQ pozostają dostępne, a pierwsze zdjęcie jest statyczne.
 - Wciąż bez zbierania danych, niepotwierdzonego cennika i ofert zajęć. Logotyp stanowi roboczą propozycję identyfikacji.
+
+## Wersja 3 — 27.09.2026
+
+- Wybrane zdjęcie rakiety i piłki (`assets/detail.png`) jest stałym banerem. Usunięto karuzelę, autoplay, strzałki, kropki, licznik i przycisk pauzy. Pozostało krótkie wejście zdjęcia i nagłówka.
+- Cienki geometryczny logotyp WAWA / padel w nawiązaniu do referencji użytkownika, w palecie bordowej i jasnej (`assets/brand/*line*`).
+- Dodane sekcje: zapisy na start, ankieta z pięcioma pytaniami, współpraca. Dane kontaktowe są nieaktywne i opisane jako podgląd. Ankieta trzyma wybory wyłącznie w pamięci otwartej strony, bez wysyłania i trwałego zapisu; przejście do podsumowania nie oznacza wysłania odpowiedzi.
+- Referencja służyła jako inspiracja struktury i logo. Nie przeniesiono niepotwierdzonych informacji o 13 kortach, adresie, darmowej godzinie, wysokości hali, rekordzie wielkości klubu ani danych spółki. Utrzymano 12 kortów i planowane otwarcie w marcu 2027.
