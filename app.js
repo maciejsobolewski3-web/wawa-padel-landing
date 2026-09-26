@@ -1,5 +1,34 @@
 'use strict';
 (() => {
+  const header = document.querySelector('.header');
+  const nav = document.querySelector('#primary-nav');
+  const toggle = document.querySelector('.menu-toggle');
+  const smallScreen = window.matchMedia('(max-width: 980px)');
+  let menuOpen = false;
+  function setMenu(open, restoreFocus = false) {
+    menuOpen = Boolean(open && smallScreen.matches);
+    header.classList.toggle('menu-open', menuOpen);
+    toggle.setAttribute('aria-expanded', String(menuOpen));
+    toggle.querySelector('.menu-label').textContent = menuOpen ? 'Zamknij' : 'Menu';
+    nav.hidden = smallScreen.matches && !menuOpen;
+    if (restoreFocus) toggle.focus();
+  }
+  header.classList.add('nav-ready');
+  toggle.hidden = false;
+  setMenu(false);
+  toggle.addEventListener('click', () => setMenu(!menuOpen));
+  nav.addEventListener('click', event => { if (event.target.closest('a')) setMenu(false); });
+  header.querySelector('.logo').addEventListener('click', () => setMenu(false));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && menuOpen) setMenu(false, true); });
+  document.addEventListener('click', event => { if (menuOpen && !header.contains(event.target)) setMenu(false); });
+  header.addEventListener('focusout', () => {
+    window.setTimeout(() => { if (menuOpen && !header.contains(document.activeElement)) setMenu(false); }, 0);
+  });
+  smallScreen.addEventListener('change', () => setMenu(false));
+  const syncHeader = () => header.classList.toggle('is-scrolled', window.scrollY > 48);
+  window.addEventListener('scroll', syncHeader, { passive: true });
+  syncHeader();
+
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const syncMotion = () => document.body.classList.toggle('motion-enabled', !reduceMotion.matches);
   reduceMotion.addEventListener('change', syncMotion);

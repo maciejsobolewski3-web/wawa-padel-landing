@@ -34,3 +34,7 @@ Wybrać narzędzie/formularz przechowujący zgłoszenia, ustalić administratora
 - Cienki geometryczny logotyp WAWA / padel w nawiązaniu do referencji użytkownika, w palecie bordowej i jasnej (`assets/brand/*line*`).
 - Dodane sekcje: zapisy na start, ankieta z pięcioma pytaniami, współpraca. Dane kontaktowe są nieaktywne i opisane jako podgląd. Ankieta trzyma wybory wyłącznie w pamięci otwartej strony, bez wysyłania i trwałego zapisu; przejście do podsumowania nie oznacza wysłania odpowiedzi.
 - Referencja służyła jako inspiracja struktury i logo. Nie przeniesiono niepotwierdzonych informacji o 13 kortach, adresie, darmowej godzinie, wysokości hali, rekordzie wielkości klubu ani danych spółki. Utrzymano 12 kortów i planowane otwarcie w marcu 2027.
+
+## Nawigacja — wersja 8
+
+Przezroczysta nawigacja z białym logo jest nałożona na baner. Po przewinięciu 48 px dostaje bordowe tło i pozostaje widoczna. Linki: Klub, Lokalizacja, Twój głos, Współpraca; CTA prowadzi do sekcji informacji o otwarciu. Do szerokości 980 px dostępne jest rozwijane menu z obsługą Escape, fokusu i zamknięciem po wyborze linku. Bez JavaScript linki pozostają dostępne. Odstęp kotwic uwzględnia stały nagłówek.
