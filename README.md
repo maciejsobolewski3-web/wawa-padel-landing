@@ -18,3 +18,12 @@ Z katalogu projektu: `python3 -m http.server 4178 --bind 127.0.0.1`, a następni
 ## Przed uruchomieniem zapisów
 
 Wybrać narzędzie/formularz przechowujący zgłoszenia, ustalić administratora danych i treść informacji dla zapisujących się, dodać właściwy endpoint i sprawdzić rzeczywisty zapis oraz obsługę błędów. Nigdy nie dodawać prywatnych kluczy do kodu strony. Dokładny adres klubu i finalne fotografie wymagają potwierdzenia. Po zatwierdzeniu strony można usunąć `noindex`.
+
+## Wersja 2 — 26.09.2026
+
+- Nowy wektorowy znak W z piłką i poziomy logotyp w wariantach bordowym i jasnym (`assets/brand/`).
+- Pełnoszerokościowa karuzela trzech zdjęć: przyciski, wybór slajdu, klawiatura, pauza i automatyczna zmiana co 7,5 s. Autoplay pauzuje po najechaniu, przy fokusie i w nieaktywnej karcie.
+- Animacje wejścia, powolne zbliżenie zdjęcia i pojawianie się treści podczas przewijania. Preferencja ograniczenia ruchu wyłącza animacje i autoplay.
+- Sekcje: baner, pasek informacji, klub i fakty, trzy podejścia do gry, indoor, plan otwarcia, lokalizacja, FAQ, końcowe zaproszenie.
+- `app.js` obsługuje karuzelę i animacje. Bez JavaScript treść i FAQ pozostają dostępne, a pierwsze zdjęcie jest statyczne.
+- Wciąż bez zbierania danych, niepotwierdzonego cennika i ofert zajęć. Logotyp stanowi roboczą propozycję identyfikacji.
