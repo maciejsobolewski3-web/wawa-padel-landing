@@ -39,3 +39,5 @@
 .cooperation .form-panel input::placeholder,.cooperation .form-panel textarea::placeholder{color:#dfcdd5;-webkit-text-fill-color:#dfcdd5;opacity:1}
 .cooperation .interest-options input{accent-color:var(--lime)}
 .cooperation .button{background:var(--lime);color:var(--wine)}
+
+.club-strip{background:var(--wine);color:var(--ivory)}
